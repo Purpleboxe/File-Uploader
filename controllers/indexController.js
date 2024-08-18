@@ -3,6 +3,7 @@ const { body, validationResult } = require("express-validator");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 const bcrypt = require("bcryptjs");
+const passportConfig = require("../config/passport");
 
 exports.signup_get = (req, res, next) => {
   res.render("signup", { title: "Sign Up" });
@@ -73,3 +74,45 @@ exports.signup_post = [
     }
   }),
 ];
+
+exports.login_get = (req, res, next) => {
+  res.render("login", { title: "Log In" });
+};
+
+exports.login_post = (req, res, next) => {
+  passportConfig.authenticate("local", (err, user, info) => {
+    if (err) {
+      return next(err);
+    }
+
+    if (!user) {
+      console.log("User authentication failed:", info.message);
+      return res.render("login", {
+        title: "Log In",
+        errors: [{ msg: "Invalid username or password." }],
+      });
+    }
+
+    req.login(user, (err) => {
+      if (err) {
+        return next(err);
+      }
+
+      return res.status("200").redirect("/");
+    });
+  })(req, res, next);
+};
+
+exports.logout_get = (req, res, next) => {
+  res.redirect("/");
+};
+
+exports.logout_post = (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+
+    res.redirect("/");
+  });
+};

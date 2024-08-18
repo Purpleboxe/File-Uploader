@@ -20,7 +20,9 @@ passport.deserializeUser(async (id, done) => {
 passport.use(
   new LocalStrategy(async (username, password, done) => {
     try {
-      const user = await prisma.user.findUnique({ where: { username } });
+      const user = await prisma.user.findUnique({
+        where: { username: username.toLowerCase() },
+      });
       if (!user || !(await bcrypt.compare(password, user.password))) {
         return done(null, false, {
           message: "Incorrect username or password.",
@@ -32,3 +34,5 @@ passport.use(
     }
   })
 );
+
+module.exports = passport;
