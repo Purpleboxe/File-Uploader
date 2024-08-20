@@ -107,12 +107,23 @@ exports.logout_get = (req, res, next) => {
   res.redirect("/");
 };
 
-exports.logout_post = (req, res, next) => {
-  req.logout((err) => {
-    if (err) {
-      return next(err);
-    }
+exports.logout_post = async (req, res, next) => {
+  try {
+    await req.session.destroy((err) => {
+      if (err) {
+        return next(err);
+      }
+    });
 
-    res.redirect("/");
-  });
+    req.logout((err) => {
+      if (err) {
+        return next(err);
+      }
+
+      res.redirect("/");
+    });
+  } catch (err) {
+    console.error("Error during logout:", err);
+    return next(err);
+  }
 };
