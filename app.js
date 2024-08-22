@@ -6,12 +6,13 @@ const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 const { PrismaClient } = require("@prisma/client");
 const passport = require("passport");
 const createError = require("http-errors");
-const crypto = require("crypto");
 
+const crypto = require("crypto");
 const secret = crypto.randomBytes(64).toString("hex");
 
 // routes
 const indexRouter = require("./routes/index");
+const fileRouter = require("./routes/fileRoutes");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -51,6 +52,7 @@ app.use((req, res, next) => {
 
 // mount routes
 app.use("/", indexRouter);
+app.use("/files", fileRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
