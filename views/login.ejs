@@ -1,0 +1,27 @@
+<section>
+  <h1><%= title %></h1>
+  <form action="/login" method="POST" novalidate>
+    <div class="input-group">
+      <label for="username">Username</label>
+      <input type="text" name="username" id="username" required />
+    </div>
+    <div class="input-group">
+      <label for="password">Password</label>
+      <input type="password" name="password" id="password" required />
+    </div>
+
+    <% if (errors) { %>
+    <ul>
+      <% errors.forEach(function(error) { %>
+      <li class="error"><%= error.msg %></li>
+      <% }); %>
+    </ul>
+    <% } %>
+
+    <button class="submit" type="submit">Log In</button>
+
+    <div class="notice">
+      Don't have an account? <a href="/signup" class="link">Sign Up</a>
+    </div>
+  </form>
+</section>

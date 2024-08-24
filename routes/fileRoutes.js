@@ -3,11 +3,13 @@ const path = require("path");
 const router = express.Router();
 const upload = require("../config/multer");
 
-router.get("/upload", (req, res) => {
+const { notAuth } = require("../config/auth");
+
+router.get("/upload", notAuth, (req, res) => {
   res.render("upload", { title: "Upload File" });
 });
 
-router.post("/upload", upload.single("image"), (req, res) => {
+router.post("/upload", notAuth, upload.single("image"), (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).send("No file uploaded.");

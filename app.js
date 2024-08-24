@@ -6,6 +6,7 @@ const { PrismaSessionStore } = require("@quixo3/prisma-session-store");
 const { PrismaClient } = require("@prisma/client");
 const passport = require("passport");
 const createError = require("http-errors");
+const partials = require("express-partials");
 
 const crypto = require("crypto");
 const secret = crypto.randomBytes(64).toString("hex");
@@ -16,8 +17,9 @@ const fileRouter = require("./routes/fileRoutes");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
-app.set("view engine", "pug");
+app.set("view engine", "ejs");
 
+app.use(partials());
 app.use(express.static(path.join(__dirname, "public")));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -65,9 +67,15 @@ app.use(function (err, req, res, next) {
   res.locals.message = err.message;
   res.locals.error = req.app.get("env") === "development" ? err : {};
 
-  // render the error page
+  // Set the status code
   res.status(err.status || 500);
-  res.render("error");
+
+  // Render the error page and pass status and message variables
+  res.render("error", {
+    status: err.status || 500,
+    message: err.message,
+    title: "Error",
+  });
 });
 
 const PORT = process.env.PORT || 3000;

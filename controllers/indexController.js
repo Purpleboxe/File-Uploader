@@ -6,7 +6,7 @@ const bcrypt = require("bcryptjs");
 const passportConfig = require("../config/passport");
 
 exports.signup_get = (req, res, next) => {
-  res.render("signup", { title: "Sign Up" });
+  res.render("signup", { title: "Sign Up", errors: [] });
 };
 
 exports.signup_post = [
@@ -76,7 +76,7 @@ exports.signup_post = [
 ];
 
 exports.login_get = (req, res, next) => {
-  res.render("login", { title: "Log In" });
+  res.render("login", { title: "Log In", errors: [] });
 };
 
 exports.login_post = (req, res, next) => {
@@ -98,32 +98,20 @@ exports.login_post = (req, res, next) => {
         return next(err);
       }
 
-      return res.status("200").redirect("/");
+      return res.status(200).redirect("/");
     });
   })(req, res, next);
 };
 
 exports.logout_get = (req, res, next) => {
-  res.redirect("/");
+  res.render("logout", { title: "Log Out", errors: [] });
 };
 
-exports.logout_post = async (req, res, next) => {
-  try {
-    await req.session.destroy((err) => {
-      if (err) {
-        return next(err);
-      }
-    });
-
-    req.logout((err) => {
-      if (err) {
-        return next(err);
-      }
-
-      res.redirect("/");
-    });
-  } catch (err) {
-    console.error("Error during logout:", err);
-    return next(err);
-  }
+exports.logout_post = (req, res, next) => {
+  req.logout((err) => {
+    if (err) {
+      return next(err);
+    }
+    res.redirect("/");
+  });
 };
