@@ -1,6 +1,24 @@
-<body>
-  <h1>Home</h1>
+<section class="flex justify-center items-center">
   <% if (user) { %>
   <h2><%= user.ogName %></h2>
+  <% } else { %>
+  <section class="text-center py-12 flex flex-col mt-10">
+    <h1 class="text-4xl font-bold mb-4">Welcome to File Uploader</h1>
+    <p class="text-lg text-gray-700 mb-8">
+      Upload and download files with ease!
+    </p>
+    <div class="flex justify-center space-x-4">
+      <a
+        href="/signup"
+        class="bg-emerald-600 font-bold text-white py-3 px-5 rounded hover:bg-emerald-700"
+        >Sign Up</a
+      >
+      <a
+        href="/login"
+        class="outline-gray-200 outline-1 outline font-bold text-emerald-600 py-3 px-5 rounded hover:bg-emerald-100 hover:outline-emerald-200"
+        >Log In</a
+      >
+    </div>
+  </section>
   <% } %>
-</body>
+</section>
