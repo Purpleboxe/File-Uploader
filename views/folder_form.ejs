@@ -1,0 +1,66 @@
+<section class="flex min-h-full flex-col px-6 py-12 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-sm">
+    <h1
+      class="mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900"
+    >
+      <%= title %>
+    </h1>
+  </div>
+  <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+    <form action="/folder/create" method="POST" novalidate class="space-y-6">
+      <div>
+        <label
+          for="folderName"
+          class="block text-sm font-medium leading-6 text-gray-900"
+        >
+          Folder Name
+        </label>
+        <div class="mt-2">
+          <input
+            type="text"
+            name="folderName"
+            id="folderName"
+            required
+            class="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-neutral-600 sm:text-sm sm:leading-6"
+          />
+        </div>
+      </div>
+
+      <div>
+        <label
+          for="parentFolder"
+          class="block text-sm font-medium leading-6 text-gray-900"
+        >
+          Parent Folder (Optional)
+        </label>
+        <div class="mt-2">
+          <select
+            name="parentFolder"
+            id="parentFolder"
+            class="block w-full rounded-md border-0 p-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-neutral-600 sm:text-sm sm:leading-6"
+          >
+            <option value="">No Parent</option>
+            <% folders.forEach(function(folder) { %>
+            <option value="<%= folder.id %>"><%= folder.name %></option>
+            <% }); %>
+          </select>
+        </div>
+      </div>
+
+      <% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+      <ul>
+        <% errors.forEach(function(error) { %>
+        <li class="leading-6 text-rose-600 tracking-tight"><%= error.msg %></li>
+        <% }); %>
+      </ul>
+      <% } %>
+
+      <button
+        class="flex w-full justify-center rounded-md bg-emerald-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-emerald-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-emerald-600"
+        type="submit"
+      >
+        Create Folder
+      </button>
+    </form>
+  </div>
+</section>

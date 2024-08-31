@@ -14,6 +14,7 @@ const secret = crypto.randomBytes(64).toString("hex");
 // routes
 const indexRouter = require("./routes/index");
 const fileRouter = require("./routes/fileRoutes");
+const folderRouter = require("./routes/folderRoutes");
 
 // view engine setup
 app.set("views", path.join(__dirname, "views"));
@@ -46,15 +47,31 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Middleware to set user in locals
-app.use((req, res, next) => {
+// Middleware to set user and folders in locals
+app.use(async (req, res, next) => {
   res.locals.user = req.user;
+
+  if (req.user) {
+    try {
+      const folders = await prisma.folder.findMany({
+        where: { userId: req.user.id },
+      });
+      res.locals.folders = folders;
+    } catch (err) {
+      console.error("Error fetching folders:", err);
+      res.locals.folders = [];
+    }
+  } else {
+    res.locals.folders = [];
+  }
+
   next();
 });
 
 // mount routes
 app.use("/", indexRouter);
-app.use("/files", fileRouter);
+app.use("/file", fileRouter);
+app.use("/folder", folderRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
