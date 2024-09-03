@@ -5,7 +5,9 @@ const router = express.Router();
 const folderController = require("../controllers/folderController");
 const { notAuth } = require("../config/auth");
 
-router.get("/create", folderController.create_get);
-router.post("/create", folderController.create_post);
+router.get("/create", notAuth, folderController.create_get);
+router.post("/create", notAuth, folderController.create_post);
+
+router.get("/:id", notAuth, folderController.folder_detail);
 
 module.exports = router;

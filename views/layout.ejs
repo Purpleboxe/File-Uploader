@@ -6,34 +6,34 @@
     <title><%= title %></title>
     <link rel="stylesheet" href="/stylesheets/output.css" />
   </head>
-  <body class="bg-gray-50">
+  <body class="bg-white">
     <% if (!user) { %>
-    <nav class="bg-white border-b">
-      <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
+    <nav class="bg-gray-50 border-b">
+      <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div class="relative flex h-16 items-center justify-between">
           <div>
-            <h2 class="font-bold px-3 text-2xl cursor-default text-emerald-600">
+            <h2 class="font-bold text-2xl text-emerald-600 cursor-default">
               File Uploader
             </h2>
           </div>
-          <div class="hidden sm:block flex justify-center">
+          <div class="hidden sm:flex space-x-4">
             <a
               href="/"
-              class="px-3 py-2 rounded-lg block font-medium text-gray-900 hover:bg-gray-200 hover:text-black"
+              class="px-3 py-2 rounded-lg font-medium text-gray-900 hover:bg-gray-200 hover:text-black"
               >Overview</a
             >
           </div>
           <div
-            class="absolute inset-y-0 right-0 flex gap-2 items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0"
+            class="absolute inset-y-0 right-0 flex gap-2 items-center pr-2 sm:static sm:inset-auto"
           >
             <a
               href="/login"
-              class="px-3 py-2 rounded-lg block font-medium text-gray-900 hover:bg-gray-200 hover:text-black"
+              class="px-3 py-2 rounded-lg font-medium text-gray-900 hover:bg-gray-200 hover:text-black"
               >Log In</a
             >
             <a
               href="/signup"
-              class="px-3 py-2 rounded-lg block font-medium bg-emerald-600 text-white hover:bg-emerald-700"
+              class="px-3 py-2 rounded-lg font-medium bg-emerald-600 text-white hover:bg-emerald-700"
               >Sign Up</a
             >
           </div>
@@ -42,26 +42,28 @@
     </nav>
     <% } else { %>
     <header
-      class="relative flex flex-row md:flex-nowrap z-0 w-full bg-white border-b text-sm py-5 items-center"
+      class="relative flex flex-wrap lg:flex-nowrap w-full bg-gray-50 border-b text-sm py-5 items-center"
     >
-      <h2 class="font-bold px-3 text-2xl w-64 cursor-default text-emerald-600">
-        File Uploader
+      <h2
+        class="font-bold text-2xl text-emerald-600 hover:text-emerald-700 w-full lg:w-64 text-center"
+      >
+        <a href="/">File Uploader</a>
       </h2>
       <div
-        class="w-full flex items-center justify-between ms-auto px-6 md:px-60 gap-x-1 md:gap-x-3"
+        class="flex-grow flex items-center justify-between px-4 md:px-60 gap-x-3"
       >
         <input
           type="text"
           placeholder="Search"
           aria-label="Search files"
-          class="block w-48 rounded-md border-0 p-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-neutral-600 sm:text-sm sm:leading-6"
+          class="block w-full lg:w-48 rounded-md border-0 p-1.5 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-neutral-600 sm:text-sm sm:leading-6"
         />
         <% if (user) { %>
         <div class="flex flex-row items-center space-x-4">
           <h2 class="font-medium text-lg"><%= user.ogName %></h2>
           <a
             href="/logout"
-            class="px-3 py-2 rounded-lg font-bold text-gray-600 hover:bg-gray-200"
+            class="px-3 py-2 rounded-lg font-medium text-lg text-gray-600 hover:bg-gray-200"
           >
             Log Out
           </a>
@@ -70,21 +72,32 @@
       </div>
     </header>
     <% } %>
-    <div class="<%= user ? 'flex flex-row' : '' %>">
+    <div class="flex flex-col lg:flex-row">
       <% if (user) { %>
       <aside
-        class="flex flex-col w-64 h-screen overflow-y-auto bg-white border-r items-start py-6 text-pretty z-10"
+        class="flex flex-col h-full w-full lg:max-w-64 lg:min-h-screen bg-gray-50 border-r items-center py-6 z-10"
       >
-        <ul>
-          <% folders.forEach(folder => { %>
-          <li class="px-4 py-2 hover:bg-gray-200">
-            <a href="/folders/<%= folder.id %>"> <%= folder.name %> </a>
-          </li>
+        <a
+          href="/folder/create"
+          class="px-3 py-2 mb-4 rounded-lg font-medium bg-emerald-600 text-white hover:bg-emerald-700"
+          >Create Folder</a
+        >
+        <ul class="w-full">
+          <% topFolders.forEach(folder => { %>
+
+          <a href="/folder/<%= folder.id %>" class="truncate"
+            ><li
+              class="flex items-center px-4 py-2 hover:bg-gray-200 overflow-x-hidden"
+            >
+              <img src="/images/folder.svg" alt="folder" class="w-6 h-6 mr-2" />
+              <div><%= folder.name %></div>
+            </li></a
+          >
           <% }) %>
         </ul>
       </aside>
       <% } %>
-      <main class="flex-grow"><%- body %></main>
+      <main class="flex-grow px-4 sm:px-6 lg:px-8 py-6"><%- body %></main>
     </div>
   </body>
 </html>

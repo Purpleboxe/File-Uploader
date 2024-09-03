@@ -56,13 +56,20 @@ app.use(async (req, res, next) => {
       const folders = await prisma.folder.findMany({
         where: { userId: req.user.id },
       });
+      // Parent folders with the highest priority (Doesn't have a parent folder)
+      const topFolders = await prisma.folder.findMany({
+        where: { userId: req.user.id, parentId: null },
+      });
       res.locals.folders = folders;
+      res.locals.topFolders = topFolders;
     } catch (err) {
       console.error("Error fetching folders:", err);
       res.locals.folders = [];
+      res.locals.topFolders = [];
     }
   } else {
     res.locals.folders = [];
+    res.locals.topFolders = [];
   }
 
   next();
