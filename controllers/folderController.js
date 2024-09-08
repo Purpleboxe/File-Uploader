@@ -28,19 +28,34 @@ exports.create_post = async (req, res, next) => {
 
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    const folders = await prisma.folder.findMany({
-      where: { userId: req.user.id },
-    });
-    return res.render("folder_form", {
-      title: "Create New Folder",
-      folders,
-      errors: errors.array(),
-    });
+    try {
+      const folders = await prisma.folder.findMany({
+        where: { userId: req.user.id },
+      });
+      return res.render("folder_form", {
+        title: "Create New Folder",
+        folders,
+        errors: errors.array(),
+      });
+    } catch (err) {
+      return next(err);
+    }
   }
 
   const { folderName, parentFolder } = req.body;
 
   try {
+    if (parentFolder) {
+      const parent = await prisma.folder.findUnique({
+        where: { id: parseInt(parentFolder, 10) },
+        select: { userId: true },
+      });
+
+      if (!parent || parent.userId !== req.user.id) {
+        return res.status(403).redirect("/");
+      }
+    }
+
     await prisma.folder.create({
       data: {
         name: folderName,
@@ -54,13 +69,19 @@ exports.create_post = async (req, res, next) => {
   }
 };
 
-exports.folder_detail = async (req, res) => {
+exports.folder_detail = async (req, res, next) => {
   try {
+    const folderId = parseInt(req.params.id, 10);
+
     const getFolderHierarchy = async (folderId) => {
       let folder = await prisma.folder.findUnique({
         where: { id: folderId },
-        include: { parent: true },
+        include: { subfolders: true, parent: true },
       });
+
+      if (!folder || folder.userId !== req.user.id) {
+        return null;
+      }
 
       const hierarchy = [];
 
@@ -80,16 +101,56 @@ exports.folder_detail = async (req, res) => {
       return hierarchy;
     };
 
-    const folderId = parseInt(req.params.id, 10);
     const folderHierarchy = await getFolderHierarchy(folderId);
 
+    if (!folderHierarchy) {
+      return res.status(403).redirect("/");
+    }
+
+    const folder = folderHierarchy[folderHierarchy.length - 1];
+
     res.render("folder_detail", {
-      title: folderHierarchy[folderHierarchy.length - 1]?.name || "Folder",
-      folder: folderHierarchy[folderHierarchy.length - 1],
+      title: folder.name || "Folder",
+      folder,
       folderHierarchy,
     });
-  } catch (error) {
-    console.error(error);
-    res.status(500).render("500", { title: "Server Error" });
+  } catch (err) {
+    console.error(err);
+    next(err);
+  }
+};
+
+exports.delete_post = async (req, res, next) => {
+  const folderId = parseInt(req.params.id, 10);
+
+  try {
+    const folder = await prisma.folder.findUnique({
+      where: { id: folderId },
+      select: { userId: true },
+    });
+
+    if (!folder || folder.userId !== req.user.id) {
+      return res.status(403).redirect("/");
+    }
+
+    const deleteAllRecursive = async (folderId) => {
+      const subfolders = await prisma.folder.findMany({
+        where: { parentId: folderId },
+      });
+
+      for (const subfolder of subfolders) {
+        await deleteAllRecursive(subfolder.id);
+      }
+
+      await prisma.folder.delete({
+        where: { id: folderId },
+      });
+    };
+
+    await deleteAllRecursive(folderId);
+    res.redirect("/");
+  } catch (err) {
+    console.error("Error deleting folder:", err);
+    next(err);
   }
 };

@@ -6,5 +6,36 @@
     </a>
     <% if (index < folderHierarchy.length - 1) { %> &gt; <% } %> <% }) %>
   </nav>
+
   <h1 class="text-2xl font-bold"><%= title %></h1>
+
+  <table class="w-full mt-5">
+    <thead class="border-b">
+      <tr>
+        <th class="py-2 px-4 text-left">Name</th>
+        <th class="py-2 px-4 text-left">Created</th>
+        <th class="py-2 px-4 text-left">Last Updated</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% folder.subfolders.forEach(childFolder => { %>
+      <tr
+        class="item folder border-b hover:bg-gray-100 cursor-pointer"
+        data-folder-id="<%= childFolder.id %>"
+        onclick="window.location='/folder/<%= childFolder.id %>'"
+      >
+        <td class="flex items-center py-2 px-4">
+          <img src="/images/folder.svg" alt="folder" class="w-6 h-6 mr-2" />
+          <span class="text-emerald-600"><%= childFolder.name %></span>
+        </td>
+        <td class="py-2 px-4">
+          <%= new Date(childFolder.createdAt).toLocaleDateString() %>
+        </td>
+        <td class="py-2 px-4">
+          <%= new Date(childFolder.updatedAt).toLocaleDateString() %>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
 </section>

@@ -87,7 +87,8 @@
 
           <a href="/folder/<%= folder.id %>" class="truncate"
             ><li
-              class="flex items-center px-4 py-2 hover:bg-gray-200 overflow-x-hidden"
+              class="flex item folder items-center px-4 py-2 hover:bg-gray-200 overflow-x-hidden"
+              data-folder-id="<%= folder.id %>"
             >
               <img src="/images/folder.svg" alt="folder" class="w-6 h-6 mr-2" />
               <div><%= folder.name %></div>
@@ -99,5 +100,21 @@
       <% } %>
       <main class="flex-grow px-4 sm:px-6 lg:px-8 py-6"><%- body %></main>
     </div>
+
+    <div
+      id="context-menu"
+      class="hidden rounded-md bg-white leading-6 shadow-lg ring-1 ring-gray-900/5 z-50 absolute"
+    >
+      <ul class="list-none">
+        <li
+          id="delete"
+          class="flex items-center px-4 py-2 hover:bg-gray-200 overflow-x-hidden cursor-pointer"
+        >
+          <img src="/images/delete.svg" alt="delete" class="w-6 h-6 mr-1" />
+          Delete
+        </li>
+      </ul>
+    </div>
+    <script src="/javascript/contextmenu.js"></script>
   </body>
 </html>
