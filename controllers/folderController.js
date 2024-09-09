@@ -120,6 +120,34 @@ exports.folder_detail = async (req, res, next) => {
   }
 };
 
+exports.update_put = async (req, res, next) => {
+  const folderId = parseInt(req.params.id, 10);
+  const { name } = req.body;
+
+  try {
+    const folder = await prisma.folder.findUnique({
+      where: { id: folderId },
+      select: { userId: true },
+    });
+
+    if (!folder || folder.userId !== req.user.id) {
+      return res.status(403).redirect("/");
+    }
+
+    await prisma.folder.update({
+      where: { id: folderId },
+      data: { name },
+    });
+
+    res.status(200).json({ message: "Folder updated successfully" });
+  } catch (err) {
+    console.error("Error updating folder:", err);
+    res
+      .status(500)
+      .json({ error: "An error occurred while renaming the folder" });
+  }
+};
+
 exports.delete_post = async (req, res, next) => {
   const folderId = parseInt(req.params.id, 10);
 

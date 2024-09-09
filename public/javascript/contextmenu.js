@@ -19,6 +19,26 @@ document.addEventListener("DOMContentLoaded", () => {
     contextMenu.classList.add("hidden");
   });
 
+  document.getElementById("update").addEventListener("click", function () {
+    if (selectedFolderId) {
+      const newFolderName = prompt("Enter the new name for the folder:");
+
+      if (newFolderName) {
+        fetch(`/folder/${selectedFolderId}/update`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name: newFolderName }),
+        })
+          .then(() => {
+            window.location.href = `/folder/${selectedFolderId}`;
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    }
+  });
+
   document.getElementById("delete").addEventListener("click", function () {
     if (selectedFolderId) {
       if (

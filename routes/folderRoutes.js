@@ -9,7 +9,7 @@ router.get("/create", notAuth, folderController.create_get);
 router.post("/create", notAuth, folderController.create_post);
 
 router.get("/:id", notAuth, folderController.folder_detail);
-
+router.put("/:id/update", notAuth, folderController.update_put);
 router.delete("/:id/delete", notAuth, folderController.delete_post);
 
 module.exports = router;
