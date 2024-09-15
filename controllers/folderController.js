@@ -76,7 +76,7 @@ exports.folder_detail = async (req, res, next) => {
     const getFolderHierarchy = async (folderId) => {
       let folder = await prisma.folder.findUnique({
         where: { id: folderId },
-        include: { subfolders: true, parent: true },
+        include: { subfolders: true, parent: true, files: true },
       });
 
       if (!folder || folder.userId !== req.user.id) {
@@ -91,7 +91,7 @@ exports.folder_detail = async (req, res, next) => {
         if (folder.parent) {
           folder = await prisma.folder.findUnique({
             where: { id: folder.parentId },
-            include: { parent: true },
+            include: { files: true, parent: true, subfolders: true },
           });
         } else {
           folder = null;
