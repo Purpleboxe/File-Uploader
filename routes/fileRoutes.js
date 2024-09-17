@@ -7,10 +7,6 @@ const { notAuth } = require("../config/auth");
 
 router.post("/:id/upload", notAuth, fileController.upload);
 
-router.get("/download/:filename", (req, res) => {
-  const fileName = req.params.filename;
-  const filePath = path.join(__dirname, "../uploads", fileName);
-  res.download(filePath);
-});
+router.get("/:fileId/download", notAuth, fileController.download);
 
 module.exports = router;

@@ -16,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.addEventListener("click", function () {
+    selectedFolderId = null;
     contextMenu.classList.add("hidden");
   });
 
@@ -33,6 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
           .then(() => {
             window.location.href = `/folder/${selectedFolderId}`;
+            selectedFolderId = null;
           })
           .catch((error) => console.error("Error:", error));
       }
@@ -54,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
           .then(() => {
             window.location.href = "/";
+            selectedFolderId = null;
           })
           .catch((error) => console.error("Error:", error));
       }

@@ -43,11 +43,11 @@
       </tr>
       <% }) %> <% folder.files.forEach(file => { %>
       <tr
-        class="item folder border-b hover:bg-gray-100 cursor-pointer"
-        onclick="window.location='<%= file.url %>'"
+        class="item file border-b hover:bg-gray-100 cursor-pointer"
+        onclick="showFileDetails('<%= file.name %>', '<%= (file.size / 1024).toFixed(2) %>', '<%= new Date(file.createdAt).toLocaleDateString() %>', '<%= file.id %>')"
       >
         <td class="flex items-center py-2 px-4">
-          <img src="/images/file.svg" alt="folder" class="w-6 h-6 mr-2" />
+          <img src="/images/file.svg" alt="file" class="w-6 h-6 mr-2" />
           <span class="text-emerald-600"><%= file.name %></span>
         </td>
         <td class="py-2 px-4">
@@ -96,4 +96,28 @@
   </div>
 </div>
 
-<script src="/javascript/upload.js"></script>
+<div
+  id="fileDetailsModal"
+  class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50"
+>
+  <div class="relative bg-white rounded-lg p-6 shadow-lg lg:w-1/3 sm:w-2/3">
+    <span
+      id="closeModalBtn"
+      class="absolute top-0 right-0 p-4 text-gray-500 hover:text-gray-800 cursor-pointer text-3xl"
+      >&times;</span
+    >
+
+    <h2 class="text-lg font-semibold mb-4">File Details</h2>
+
+    <div id="fileInfo"></div>
+
+    <button
+      id="downloadBtn"
+      class="mt-4 px-3 py-2 rounded-lg font-medium bg-emerald-600 text-white hover:bg-emerald-700"
+    >
+      Download
+    </button>
+  </div>
+</div>
+
+<script src="/javascript/popup.js"></script>

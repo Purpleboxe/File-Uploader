@@ -2,6 +2,7 @@ const express = require("express");
 const upload = require("../config/multer");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const path = require("path");
 
 exports.upload = (req, res, next) => {
   upload(req, res, async (err) => {
@@ -39,4 +40,32 @@ exports.upload = (req, res, next) => {
       next(err);
     }
   });
+};
+
+exports.download = async (req, res, next) => {
+  try {
+    const fileId = parseInt(req.params.fileId, 10);
+
+    if (isNaN(fileId)) {
+      return res.status(400).send("Invalid file ID");
+    }
+
+    const file = await prisma.file.findUnique({
+      where: { id: fileId },
+    });
+
+    if (!file) {
+      return res.status(404).send("File not found");
+    }
+
+    const filePath = path.join(__dirname, "../", file.url);
+
+    res.download(filePath, file.name, (err) => {
+      if (err) {
+        next(err);
+      }
+    });
+  } catch (err) {
+    next(err);
+  }
 };
