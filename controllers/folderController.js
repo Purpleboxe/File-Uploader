@@ -162,6 +162,15 @@ exports.delete_post = async (req, res, next) => {
     }
 
     const deleteAllRecursive = async (folderId) => {
+      folder.files.forEach((file) => {
+        const filePath = path.join(__dirname, "../", file.url);
+        if (fs.existsSync(filePath)) {
+          fs.unlink(filePath, (err) => {
+            if (err) console.error("Error deleting file:", err);
+          });
+        }
+      });
+
       const subfolders = await prisma.folder.findMany({
         where: { parentId: folderId },
       });
