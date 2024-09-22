@@ -155,6 +155,7 @@ exports.delete_post = async (req, res, next) => {
     const folder = await prisma.folder.findUnique({
       where: { id: folderId },
       select: { userId: true },
+      include: { files: true },
     });
 
     if (!folder || folder.userId !== req.user.id) {

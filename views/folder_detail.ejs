@@ -32,7 +32,9 @@
       >
         <td class="flex items-center py-2 px-4">
           <img src="/images/folder.svg" alt="folder" class="w-6 h-6 mr-2" />
-          <span class="text-emerald-600"><%= childFolder.name %></span>
+          <span class="text-emerald-600 sm:text-sm"
+            ><%= childFolder.name %></span
+          >
         </td>
         <td class="py-2 px-4">
           <%= new Date(childFolder.createdAt).toLocaleDateString() %>
@@ -40,22 +42,42 @@
         <td class="py-2 px-4">
           <%= new Date(childFolder.updatedAt).toLocaleDateString() %>
         </td>
+        <td>
+          <button
+            class="z-20 ellipsis folder px-4"
+            data-folder-id="<%= folder.id %>"
+          >
+            ⋮
+          </button>
+        </td>
       </tr>
       <% }) %> <% folder.files.forEach(file => { %>
       <tr
         class="item file border-b hover:bg-gray-100 cursor-pointer"
         data-file-id="<%= file.id %>"
+        data-current-folder="<%= folder.id %>"
         onclick="showFileDetails('<%= file.name %>', '<%= (file.size / 1024).toFixed(2) %>', '<%= new Date(file.createdAt).toLocaleDateString() %>', '<%= file.id %>')"
       >
         <td class="flex items-center py-2 px-4">
           <img src="/images/file.svg" alt="file" class="w-6 h-6 mr-2" />
-          <span class="text-emerald-600"><%= file.name %></span>
+          <span class="text-emerald-600 lg:text-base sm:text-sm"
+            ><%= file.name %></span
+          >
         </td>
         <td class="py-2 px-4">
           <%= new Date(file.createdAt).toLocaleDateString() %>
         </td>
         <td class="py-2 px-4">
           <%= new Date(file.updatedAt).toLocaleDateString() %>
+        </td>
+        <td>
+          <button
+            class="z-20 ellipsis file px-4"
+            data-file-id="<%= file.id %>"
+            data-current-folder="<%= folder.id %>"
+          >
+            ⋮
+          </button>
         </td>
       </tr>
       <% }) %>

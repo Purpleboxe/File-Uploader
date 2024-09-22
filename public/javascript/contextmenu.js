@@ -2,9 +2,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const contextMenu = document.getElementById("context-menu");
   let selectedFolderId = null;
   let selectedFileId = null;
+  let currentFolder = null;
+
+  const offsetX = 50;
+  const offsetY = 10;
 
   document.querySelectorAll(".item").forEach((item) => {
     item.addEventListener("contextmenu", function (e) {
+      e.stopPropagation();
       e.preventDefault();
 
       if (item.classList.contains("folder")) {
@@ -14,8 +19,29 @@ document.addEventListener("DOMContentLoaded", () => {
         contextMenu.classList.remove("hidden");
       } else if (item.classList.contains("file")) {
         selectedFileId = this.dataset.fileId;
+        currentFolder = this.dataset.currentFolder;
         contextMenu.style.top = `${e.pageY}px`;
         contextMenu.style.left = `${e.pageX}px`;
+        contextMenu.classList.remove("hidden");
+      }
+    });
+  });
+
+  document.querySelectorAll(".ellipsis").forEach((ellipsis) => {
+    ellipsis.addEventListener("click", function (e) {
+      e.stopPropagation();
+      e.preventDefault();
+
+      if (ellipsis.classList.contains("folder")) {
+        selectedFolderId = this.dataset.folderId;
+        contextMenu.style.top = `${e.pageY + offsetY}px`;
+        contextMenu.style.left = `${e.pageX - offsetX}px`;
+        contextMenu.classList.remove("hidden");
+      } else if (ellipsis.classList.contains("file")) {
+        selectedFileId = this.dataset.fileId;
+        currentFolder = this.dataset.currentFolder;
+        contextMenu.style.top = `${e.pageY + offsetY}px`;
+        contextMenu.style.left = `${e.pageX - offsetX}px`;
         contextMenu.classList.remove("hidden");
       }
     });
@@ -24,6 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", function () {
     selectedFolderId = null;
     selectedFileId = null;
+    currentFolder = null;
     contextMenu.classList.add("hidden");
   });
 
@@ -49,6 +76,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const newFileName = prompt("Enter the new name for the file:");
 
       if (newFileName) {
+        window.location.href = `/folder/${currentFolder}`;
         fetch(`/file/${selectedFileId}/update`, {
           method: "PUT",
           headers: {
@@ -57,8 +85,9 @@ document.addEventListener("DOMContentLoaded", () => {
           body: JSON.stringify({ name: newFileName }),
         })
           .then(() => {
-            window.location.href = `/`;
+            window.location.reload();
             selectedFileId = null;
+            currentFolder = null;
           })
           .catch((error) => console.error("Error:", error));
       }
@@ -90,6 +119,7 @@ document.addEventListener("DOMContentLoaded", () => {
           "Are you sure you want to delete this file? (The file will be lost!)"
         )
       ) {
+        window.location.href = `/folder/${currentFolder}`;
         fetch(`/file/${selectedFileId}/delete`, {
           method: "DELETE",
           headers: {
@@ -97,7 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
           },
         })
           .then(() => {
-            window.location.href = "/";
+            window.location.reload();
             selectedFileId = null;
           })
           .catch((error) => console.error("Error:", error));
