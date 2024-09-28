@@ -2,8 +2,11 @@ const express = require("express");
 const upload = require("../config/multer");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
-const path = require("path");
-const fs = require("fs");
+const { createClient } = require("@supabase/supabase-js");
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 exports.upload = (req, res, next) => {
   upload(req, res, async (err) => {
@@ -23,13 +26,28 @@ exports.upload = (req, res, next) => {
         return res.status(403).redirect("/");
       }
 
-      const { filename, path, size } = req.file;
+      const { originalname, buffer, mimetype } = req.file;
+      const filePath = `uploads/${req.user.id}/${originalname}`;
+
+      const { data, error } = await supabase.storage
+        .from("files")
+        .upload(filePath, buffer, {
+          contentType: mimetype,
+          upsert: true,
+        });
+
+      if (error) {
+        console.error("Supabase upload error:", error);
+        throw new Error("Supabase upload failed");
+      }
+
+      const url = `${process.env.SUPABASE_URL}/storage/v1/object/public/files/${filePath}`;
 
       await prisma.file.create({
         data: {
-          name: filename,
-          url: path,
-          size: size,
+          name: originalname,
+          url: url,
+          size: buffer.length,
           folderId: folder.id,
           userId: req.user.id,
         },
@@ -59,15 +77,29 @@ exports.download = async (req, res, next) => {
       return res.status(404).send("File not found");
     }
 
-    const filePath = path.join(__dirname, "../", file.url);
+    const filePath = file.url.split("files/")[1];
 
-    res.download(filePath, file.name, (err) => {
-      if (err) {
-        next(err);
-      }
-    });
+    console.log(`Attempting to download file from path: ${filePath}`);
+
+    const { data, error } = await supabase.storage
+      .from("files")
+      .download(filePath);
+
+    if (error) {
+      console.error("Supabase download error:", error);
+      throw new Error("Error downloading file from Supabase");
+    }
+
+    const arrayBuffer = await data.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+
+    res.setHeader("Content-Type", file.mimetype || "application/octet-stream");
+    res.setHeader("Content-Disposition", `attachment; filename="${file.name}"`);
+
+    res.send(buffer);
   } catch (err) {
-    next(err);
+    console.error("Error downloading file", err);
+    res.status(500).send("Sorry, looks like you encountered an error.");
   }
 };
 
@@ -84,21 +116,27 @@ exports.update = async (req, res, next) => {
       return res.status(404).send("File not found");
     }
 
-    const oldPath = path.join(__dirname, "../uploads", file.name);
-    const newPath = path.join(__dirname, "../uploads", name);
+    const newFileName = name;
+    const newFilePath = `uploads/${req.user.id}/${newFileName}`;
+    const oldFilePath = file.url.split("files/")[1];
 
-    fs.rename(oldPath, newPath, async (err) => {
-      if (err) {
-        return next(err);
-      }
+    const { error } = await supabase.storage
+      .from("files")
+      .move(oldFilePath, newFilePath);
 
-      await prisma.file.update({
-        where: { id: fileId },
-        data: { name: name, url: `/uploads/${name}` },
-      });
+    if (error) {
+      return next(error);
+    }
 
-      res.send("File updated successfully");
+    await prisma.file.update({
+      where: { id: fileId },
+      data: {
+        name: newFileName,
+        url: `${process.env.SUPABASE_URL}/storage/v1/object/public/files/${newFilePath}`,
+      },
     });
+
+    res.send("File updated successfully");
   } catch (err) {
     next(err);
   }
@@ -120,27 +158,19 @@ exports.delete = async (req, res, next) => {
       return res.status(404).send("File not found");
     }
 
-    const filePath = path.join(__dirname, "../", file.url);
+    const filePath = file.url.split("files/")[1];
 
-    if (fs.existsSync(filePath)) {
-      fs.unlink(filePath, async (err) => {
-        if (err) return next(err);
+    const { error } = await supabase.storage.from("files").remove([filePath]);
 
-        await prisma.file.delete({
-          where: { id: fileId },
-        });
-
-        res.send("File deleted successfully");
-      });
-    } else {
-      await prisma.file.delete({
-        where: { id: fileId },
-      });
-
-      res.send(
-        "File deleted successfully, but file was not found in the filesystem"
-      );
+    if (error) {
+      return next(error);
     }
+
+    await prisma.file.delete({
+      where: { id: fileId },
+    });
+
+    res.send("File deleted successfully");
   } catch (err) {
     next(err);
   }

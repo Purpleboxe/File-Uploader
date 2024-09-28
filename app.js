@@ -7,6 +7,8 @@ const { PrismaClient } = require("@prisma/client");
 const passport = require("passport");
 const createError = require("http-errors");
 const partials = require("express-partials");
+const fs = require("fs");
+const uploadsDir = path.join(__dirname, "uploads");
 
 const crypto = require("crypto");
 const secret = crypto.randomBytes(64).toString("hex");
@@ -74,6 +76,10 @@ app.use(async (req, res, next) => {
 
   next();
 });
+
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
 
 // mount routes
 app.use("/", indexRouter);

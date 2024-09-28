@@ -108,6 +108,7 @@ document.addEventListener("DOMContentLoaded", () => {
           },
         })
           .then(() => {
+            console.log(window.location.href);
             window.location.href = "/";
             selectedFolderId = null;
           })

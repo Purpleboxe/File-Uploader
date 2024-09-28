@@ -1,6 +1,13 @@
 const { validationResult } = require("express-validator");
 const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
+const path = require("path");
+const fs = require("fs");
+const { createClient } = require("@supabase/supabase-js");
+const supabase = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_KEY
+);
 
 exports.create_get = async (req, res, next) => {
   if (!req.user || !req.user.id) {
@@ -154,13 +161,21 @@ exports.delete_post = async (req, res, next) => {
   try {
     const folder = await prisma.folder.findUnique({
       where: { id: folderId },
-      select: { userId: true },
-      include: { files: true },
+      include: { user: true, files: true },
     });
 
     if (!folder || folder.userId !== req.user.id) {
       return res.status(403).redirect("/");
     }
+
+    const deleteFileFromSupabase = async (supabaseFilePath) => {
+      const { data, error } = await supabase.storage
+        .from("files")
+        .remove([supabaseFilePath]);
+      if (error) {
+        console.error("Error deleting file from Supabase:", error);
+      }
+    };
 
     const deleteAllRecursive = async (folderId) => {
       folder.files.forEach((file) => {
@@ -170,6 +185,9 @@ exports.delete_post = async (req, res, next) => {
             if (err) console.error("Error deleting file:", err);
           });
         }
+
+        const supabaseFilePath = file.url.split("files/")[1];
+        deleteFileFromSupabase(supabaseFilePath);
       });
 
       const subfolders = await prisma.folder.findMany({
