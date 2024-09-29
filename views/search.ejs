@@ -1,0 +1,97 @@
+<section>
+  <h1 class="text-2xl font-bold"><%= title %></h1>
+
+  <table class="w-full">
+    <thead class="border-b">
+      <tr>
+        <th class="py-2 px-4 text-left">Name</th>
+        <th class="py-2 px-4 text-left">Created</th>
+        <th class="py-2 px-4 text-left">Last Updated</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% folders.forEach(folder => { %>
+      <tr
+        class="item folder border-b hover:bg-gray-100 cursor-pointer"
+        data-folder-id="<%= folder.id %>"
+        onclick="window.location='/folder/<%= folder.id %>'"
+      >
+        <td class="flex items-center py-2 px-4">
+          <img src="/images/folder.svg" alt="folder" class="w-6 h-6 mr-2" />
+          <span class="text-emerald-600 lg:text-base sm:text-sm"
+            ><%= folder.name %></span
+          >
+        </td>
+        <td class="py-2 px-4">
+          <%= new Date(folder.createdAt).toLocaleDateString() %>
+        </td>
+        <td class="py-2 px-4">
+          <%= new Date(folder.updatedAt).toLocaleDateString() %>
+        </td>
+        <td>
+          <button
+            class="z-20 ellipsis folder px-4"
+            data-folder-id="<%= folder.id %>"
+          >
+            ⋮
+          </button>
+        </td>
+      </tr>
+      <% }) %> <% files.forEach(file => { %>
+      <tr
+        class="item file border-b hover:bg-gray-100 cursor-pointer"
+        data-file-id="<%= file.id %>"
+        onclick="showFileDetails('<%= file.name %>', '<%= (file.size / 1024).toFixed(2) %>', '<%= new Date(file.createdAt).toLocaleDateString() %>', '<%= file.id %>')"
+      >
+        <td class="flex items-center py-2 px-4">
+          <img src="/images/file.svg" alt="file" class="w-6 h-6 mr-2" />
+          <span class="text-emerald-600 lg:text-base sm:text-sm"
+            ><%= file.name %></span
+          >
+        </td>
+        <td class="py-2 px-4">
+          <%= new Date(file.createdAt).toLocaleDateString() %>
+        </td>
+        <td class="py-2 px-4">
+          <%= new Date(file.updatedAt).toLocaleDateString() %>
+        </td>
+        <td>
+          <button class="z-20 ellipsis file px-4" data-file-id="<%= file.id %>">
+            ⋮
+          </button>
+        </td>
+      </tr>
+      <% }) %>
+    </tbody>
+  </table>
+
+  <% if (folders.length === 0 && files.length === 0) { %>
+  <p>No results found for your search.</p>
+  <% } %>
+</section>
+
+<div
+  id="fileDetailsModal"
+  class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center z-50"
+>
+  <div class="relative bg-white rounded-lg p-6 shadow-lg lg:w-1/3 sm:w-2/3">
+    <span
+      id="closeModalBtn"
+      class="absolute top-0 right-0 p-4 text-gray-500 hover:text-gray-800 cursor-pointer text-3xl"
+      >&times;</span
+    >
+
+    <h2 class="text-lg font-semibold mb-4">File Details</h2>
+
+    <div id="fileInfo"></div>
+
+    <button
+      id="downloadBtn"
+      class="mt-4 px-3 py-2 rounded-lg font-medium bg-emerald-600 text-white hover:bg-emerald-700"
+    >
+      Download
+    </button>
+  </div>
+</div>
+
+<script src="/javascript/popup.js"></script>

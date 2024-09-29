@@ -1,8 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const asyncHandler = require("express-async-handler");
-const { PrismaClient } = require("@prisma/client");
-const prisma = new PrismaClient();
 
 const indexController = require("../controllers/indexController");
 const { auth, notAuth } = require("../config/auth");
@@ -16,6 +13,8 @@ router.get("/", async (req, res, next) => {
     next(err);
   }
 });
+
+router.get("/search", notAuth, indexController.search);
 
 // All signup and login routes
 router.get("/signup", auth, indexController.signup_get);

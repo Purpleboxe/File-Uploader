@@ -123,3 +123,44 @@ exports.logout_post = (req, res, next) => {
     });
   });
 };
+
+exports.search = async (req, res, next) => {
+  const { query } = req.query;
+
+  if (!query) {
+    return res.render("search", {
+      folders: [],
+      files: [],
+      title: "Search Results",
+    });
+  }
+
+  try {
+    const folders = await prisma.folder.findMany({
+      where: {
+        name: {
+          contains: query,
+          mode: "insensitive",
+        },
+      },
+    });
+
+    const files = await prisma.file.findMany({
+      where: {
+        name: {
+          contains: query,
+          mode: "insensitive",
+        },
+      },
+    });
+
+    res.render("search", {
+      title: "Search Results",
+      folders,
+      files,
+    });
+  } catch (err) {
+    console.log("Error searching for folders and files:", err);
+    next(err);
+  }
+};

@@ -76,7 +76,11 @@ document.addEventListener("DOMContentLoaded", () => {
       const newFileName = prompt("Enter the new name for the file:");
 
       if (newFileName) {
-        window.location.href = `/folder/${currentFolder}`;
+        if (currentFolder) {
+          window.location.href = `/folder/${currentFolder}`;
+        } else {
+          window.location.href = "/";
+        }
         fetch(`/file/${selectedFileId}/update`, {
           method: "PUT",
           headers: {
