@@ -14,7 +14,7 @@ exports.upload = (req, res, next) => {
       return res.status(400).send(err);
     }
 
-    const folderId = parseInt(req.params.id, 10);
+    const folderId = req.params.id;
 
     try {
       const folder = await prisma.folder.findUnique({
@@ -63,11 +63,7 @@ exports.upload = (req, res, next) => {
 
 exports.download = async (req, res, next) => {
   try {
-    const fileId = parseInt(req.params.fileId, 10);
-
-    if (isNaN(fileId)) {
-      return res.status(400).send("Invalid file ID");
-    }
+    const fileId = req.params.fileId;
 
     const file = await prisma.file.findUnique({
       where: { id: fileId },
@@ -105,7 +101,7 @@ exports.download = async (req, res, next) => {
 
 exports.update = async (req, res, next) => {
   try {
-    const fileId = parseInt(req.params.fileId, 10);
+    const fileId = req.params.fileId;
     const { name } = req.body;
 
     const file = await prisma.file.findUnique({
@@ -144,7 +140,7 @@ exports.update = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
   try {
-    const fileId = parseInt(req.params.fileId, 10);
+    const fileId = req.params.fileId;
 
     if (isNaN(fileId)) {
       return res.status(400).send("Invalid file ID");

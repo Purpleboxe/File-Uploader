@@ -1,14 +1,39 @@
 const express = require("express");
 const router = express.Router();
+const { PrismaClient } = require("@prisma/client");
+const prisma = new PrismaClient();
 
 const indexController = require("../controllers/indexController");
 const { auth, notAuth } = require("../config/auth");
 
 router.get("/", async (req, res, next) => {
   try {
-    res.render("index", {
-      title: "File Uploader",
-    });
+    if (req.user) {
+      const userId = req.user.id;
+
+      let folders = await prisma.folder.findMany({
+        where: { userId: userId },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      });
+
+      let files = await prisma.file.findMany({
+        where: { userId: userId },
+        orderBy: { createdAt: "desc" },
+        take: 5,
+      });
+
+      res.render("index", {
+        title: "File Uploader",
+        user: req.user,
+        folders,
+        files,
+      });
+    } else {
+      res.render("index", {
+        title: "File Uploader",
+      });
+    }
   } catch (err) {
     next(err);
   }

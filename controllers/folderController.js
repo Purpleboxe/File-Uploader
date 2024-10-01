@@ -54,7 +54,7 @@ exports.create_post = async (req, res, next) => {
   try {
     if (parentFolder) {
       const parent = await prisma.folder.findUnique({
-        where: { id: parseInt(parentFolder, 10) },
+        where: { id: parentFolder },
         select: { userId: true },
       });
 
@@ -67,7 +67,7 @@ exports.create_post = async (req, res, next) => {
       data: {
         name: folderName,
         userId: req.user.id,
-        parentId: parentFolder ? parseInt(parentFolder, 10) : null,
+        parentId: parentFolder ? parentFolder : null,
       },
     });
     res.redirect("/");
@@ -78,7 +78,7 @@ exports.create_post = async (req, res, next) => {
 
 exports.folder_detail = async (req, res, next) => {
   try {
-    const folderId = parseInt(req.params.id, 10);
+    const folderId = req.params.id;
 
     const getFolderHierarchy = async (folderId) => {
       let folder = await prisma.folder.findUnique({
@@ -128,7 +128,7 @@ exports.folder_detail = async (req, res, next) => {
 };
 
 exports.update_put = async (req, res, next) => {
-  const folderId = parseInt(req.params.id, 10);
+  const folderId = req.params.id;
   const { name } = req.body;
 
   try {
@@ -156,7 +156,7 @@ exports.update_put = async (req, res, next) => {
 };
 
 exports.delete_post = async (req, res, next) => {
-  const folderId = parseInt(req.params.id, 10);
+  const folderId = req.params.id;
 
   try {
     const folder = await prisma.folder.findUnique({

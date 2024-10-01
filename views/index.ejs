@@ -1,5 +1,80 @@
-<section class="flex justify-center items-center">
-  <% if (user) { %> <% } else { %>
+<section>
+  <% if (user) { %>
+  <section>
+    <h1 class="text-4xl font-bold mb-4">Welcome back, <%= user.ogName %></h1>
+    <table class="w-full">
+      <div class="flex flex-row">
+        <p class="text-lg font-bold mb-4 pr-2">Recent</p>
+        <img src="/images/history.svg" alt="recent" class="w-6 h-6 mr-2" />
+      </div>
+
+      <thead class="border-b">
+        <tr>
+          <th class="py-2 px-4 text-left">Name</th>
+          <th class="py-2 px-4 text-left">Created</th>
+          <th class="py-2 px-4 text-left">Last Updated</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% folders.forEach(folder => { %>
+        <tr
+          class="item folder border-b hover:bg-gray-100 cursor-pointer"
+          data-folder-id="<%= folder.id %>"
+          onclick="window.location='/folder/<%= folder.id %>'"
+        >
+          <td class="flex items-center py-2 px-4">
+            <img src="/images/folder.svg" alt="folder" class="w-6 h-6 mr-2" />
+            <span class="text-emerald-600 lg:text-base sm:text-sm"
+              ><%= folder.name %></span
+            >
+          </td>
+          <td class="py-2 px-4">
+            <%= new Date(folder.createdAt).toLocaleDateString() %>
+          </td>
+          <td class="py-2 px-4">
+            <%= new Date(folder.updatedAt).toLocaleDateString() %>
+          </td>
+          <td>
+            <button
+              class="z-20 ellipsis folder px-4"
+              data-folder-id="<%= folder.id %>"
+            >
+              ⋮
+            </button>
+          </td>
+        </tr>
+        <% }) %> <% files.forEach(file => { %>
+        <tr
+          class="item file border-b hover:bg-gray-100 cursor-pointer"
+          data-file-id="<%= file.id %>"
+          onclick="showFileDetails('<%= file.name %>', '<%= (file.size / 1024).toFixed(2) %>', '<%= new Date(file.createdAt).toLocaleDateString() %>', '<%= file.id %>')"
+        >
+          <td class="flex items-center py-2 px-4">
+            <img src="/images/file.svg" alt="file" class="w-6 h-6 mr-2" />
+            <span class="text-emerald-600 lg:text-base sm:text-sm"
+              ><%= file.name %></span
+            >
+          </td>
+          <td class="py-2 px-4">
+            <%= new Date(file.createdAt).toLocaleDateString() %>
+          </td>
+          <td class="py-2 px-4">
+            <%= new Date(file.updatedAt).toLocaleDateString() %>
+          </td>
+          <td>
+            <button
+              class="z-20 ellipsis file px-4"
+              data-file-id="<%= file.id %>"
+            >
+              ⋮
+            </button>
+          </td>
+        </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </section>
+  <% } else { %>
   <section class="text-center py-12 flex flex-col mt-10">
     <h1 class="text-4xl font-bold mb-4">Welcome to File Uploader</h1>
     <p class="text-lg text-gray-700 mb-8">
